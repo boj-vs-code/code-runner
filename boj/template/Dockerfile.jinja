@@ -1,19 +1,19 @@
-FROM 1.13.4-alpine3.10 AS build-env
+FROM {{ image if image else "ubuntu:latest" }}
+WORKDIR /app
 
-COPY ../../runner /src
-RUN go get && go build
-
-FROM {{ image if image else "ubuntu:latest" }} AS runtime
-
-COPY --from build-env /src/runner /runner
+COPY ./runner /runner
 
 {% if setup %}
 RUN {{ setup }}
 {% endif %}
 
 {% for key, value in env.items() %}
-ENV RUNNER_{{key.upper()}}='{{value.replace("'", "\\'").replace(' ', '\\ ')}}'
+ENV RUNNER_{{key.upper()}}="{{
+    value.replace("'", "\\'")
+        .replace(' ', '\\ ')
+        .replace('"', "\\\"")}}"
 {% endfor %}
 
+RUN chmod +x /runner
 EXPOSE 5000
 ENTRYPOINT [ '/runner' ]
