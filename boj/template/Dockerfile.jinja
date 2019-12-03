@@ -1,0 +1,19 @@
+FROM 1.13.4-alpine3.10 AS build-env
+
+COPY ../../runner /src
+RUN go get && go build
+
+FROM {{ image if image else "ubuntu:latest" }} AS runtime
+
+COPY --from build-env /src/runner /runner
+
+{% if setup %}
+RUN {{ setup }}
+{% endif %}
+
+{% for key, value in env.items() %}
+ENV RUNNER_{{key.upper()}}='{{value.replace("'", "\\'").replace(' ', '\\ ')}}'
+{% endfor %}
+
+EXPOSE 5000
+ENTRYPOINT [ '/runner' ]

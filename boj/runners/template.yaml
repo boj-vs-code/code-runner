@@ -1,0 +1,8 @@
+# image: <image tag to use>
+
+# setup: <setup environment, (e.g. `install` in travis-ci)>
+
+# env: <environment values>
+#   source_filename: Main.py
+#   script: python3 Main.py
+#   compile: python3 -c "import py_compile; py_compile.compile(r'Main.py')"
