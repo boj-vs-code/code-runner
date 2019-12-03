@@ -1,0 +1,8 @@
+image: python:3.7.4
+
+setup: python3 --version
+
+env:
+  source_filename: Main.py
+  script: python3 Main.py
+  compile: python3 -c "import py_compile; py_compile.compile(r'Main.py')"
