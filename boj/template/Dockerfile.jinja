@@ -16,4 +16,4 @@ ENV RUNNER_{{key.upper()}}="{{
 
 RUN chmod +x /runner
 EXPOSE 5000
-ENTRYPOINT [ '/runner' ]
+ENTRYPOINT /runner
