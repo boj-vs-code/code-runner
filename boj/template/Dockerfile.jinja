@@ -1,17 +1,10 @@
 FROM {{ image if image else "ubuntu:latest" }}
 WORKDIR /app
-
 COPY ./runner /runner
-
-{% if setup %}
-RUN {{ setup }}
-{% endif %}
-
-{% for key, value in env.items() %}
-ENV RUNNER_{{key.upper()}}="{{
+{% if setup %}RUN {{ setup }}{% endif %}
+{% for key, value in env.items() %}ENV RUNNER_{{key.upper()}}="{{
     value.replace('"', "\\\"")}}"
 {% endfor %}
-
 RUN chmod +x /runner
 EXPOSE 5000
 ENTRYPOINT /runner
