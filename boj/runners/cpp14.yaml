@@ -1,0 +1,6 @@
+image: gcc:8.3.0
+
+env:
+  source_filename: Main.cc
+  compile: g++ Main.cc -o Main -O2 -Wall -lm -static -std=gnu++14 -DONLINE_JUDGE -DBOJ
+  script: ./Main
