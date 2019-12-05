@@ -1,0 +1,52 @@
+openapi: 3.0.0
+info:
+  title: Code runner for boj-vs-code
+  version: 0.1.0
+servers:
+  - url: https://bojvscode.app/run  # not fixed yet.
+paths:
+  /:
+    post:
+      operationId: runner
+      summary: Run solution
+      requestBody:
+        description: request with problem id and solution.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                problem_id:
+                  type: integer
+                  example: 1000
+                code:
+                  type: integer
+                  example: print(sum(map(int, input().split())))
+      responses:
+        '200':
+          description: response including data about the run.
+          content:
+            application/json:
+              examples:
+                success:
+                  value:
+                    code: "print(sum(map(int, input().split())))"  # the code you ran.
+                    success: true  # result of the run.
+                    failed: []  # failed cases.
+                    message: ""  # more data
+                failed:
+                  value:
+                    code: "print('hello world!')"  # the code you ran.
+                    success: false  # result of the run.
+                    failed: ['1 2', '3', 'hello world!']  # failed cases. list of [input, expected, actual]
+                    message: ""  # more data
+                compile_error:
+                  value:
+                    code: "print(sum(map(int, input().split()))))"  # the code you ran.
+                    success: false  # result of the run.
+                    failed: []  # failed cases. list of [input, expected, actual]
+                    message: |
+                      compile error:   File \Main.py, line 1
+    print(sum(map(int, input().split()))))
+                                         ^
+SyntaxError: invalid syntax  # more data
