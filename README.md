@@ -10,12 +10,11 @@ The collection consists of code runners to provide same environment for users.
 ## Note
 
 *DONT* believe dockerfiles keep up to date.  
-Please use the following command to get the latest dockerfile.
+Please use the following command to get the latest dockerfiles and to build the dockerfiles.
+The docker images will be tagged with following format, `code-runner-<platform>-<language>`.
 
 ```bash
-$ ./scripts
+$ ./scripts/bake_all.sh <platform>  # (e.g. boj)
 ```
 
-Now, `./scripts/bake.sh` supports only [Baekjoon Online Judge]. Also the script is written based on expect to be executed at the root of this project.
-
-[Baekjoon Online Judge]: https://boj.kr
+The script is written based on expect to be executed at the root of this project.
