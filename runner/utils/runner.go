@@ -1,11 +1,13 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/boj-vs-code/code-runner/runner/models"
+	"github.com/cosiner/argv"
 	"log"
 	"os"
 	"os/exec"
-	"strings"
+	"io/ioutil"
 )
 
 func GetExecutionScript() string {
@@ -30,44 +32,76 @@ func Run(runnerRequest *models.RunnerRequest) *models.RunnerResult {
 	problem := models.GetProblemById(problemId)
 	testCases := flatAndGroup(problem.Testcases)
 
-	var runnerResult models.RunnerResult
+	runnerResult := &models.RunnerResult{}
 	runnerResult.Code = code
 	runnerResult.Failed = make([][3]string, 0)
 	runnerResult.Success = true
 
 	setUpSourceFile(code, sourceFilename)
-	runCommand(compile, "")
+	output, err := runCommand(compile)
+	if err != nil {
+		runnerResult.Message = fmt.Sprintf(
+			"%s: %s, {error: %s}", "Compile Error", err, output)
+		return runnerResult
+	}
 	for i := 0; i < len(testCases); i++ {
 		input, expected := testCases[i][0], testCases[i][1]
 		success, actual := runTestCase(script, input, expected)
 		runnerResult.Success = runnerResult.Success && success
 		if !success {
-			log.Printf("failed %s %s %s\n", input, expected, actual)
+			log.Printf("failed\ninput: %s\nexpectd: %s\nactual: %s\n", input, expected, actual)
 			runnerResult.Failed = append(runnerResult.Failed, [3]string{input, expected, actual})
 		}
 	}
-	return &runnerResult
+	return runnerResult
 }
 
-func runCommand(command string, input string) string {
+func runCommand(command string) (string, error) {
+	return runCommandWithInput(command, "")
+}
+
+func runCommandWithInput(command string, input string) (string, error) {
+	log.Print("Command ", command)
 	if length := len(input); length > 0 && input[length - 1] != '\n' {
 		input += "\n"
 	}
 
-	args := strings.Split(command, " ")
+	argv, err := argv.Argv([]rune(command),	argv.ParseEnv(os.Environ()), argv.Run)
+	if err != nil {
+		return "", err
+	}
+	args := argv[0]
 	cmd := exec.Command(args[0], args[1:]...)
-	stdin, _ := cmd.StdinPipe()
+	stderr, _ := cmd.StderrPipe()
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		// FIXME: how to check err effectively.
+		errBytes, _ := ioutil.ReadAll(stderr)
+		return string(errBytes), err
+	}
+	defer stderr.Close()
 	defer stdin.Close()
 
 	stdin.Write([]byte(input))
 
-	output, _ := cmd.Output()
-	return string(output)
+	output, err := cmd.Output()
+	if err != nil {
+		if string(output) == "" {
+			// FIXME: how to check err effectively.
+			errBytes, _ := ioutil.ReadAll(stderr)
+			return string(errBytes), err
+		}
+		return string(output), err
+	}
+	return string(output), nil
 }
 
 func runTestCase(command string, input string, expected string) (bool, string) {
 	log.Printf("runTestCase called %s %s", input, expected)
-	output := runCommand(command, input)
+	output, err := runCommandWithInput(command, input)
+	if err != nil {
+		log.Panic("runTestCase error", err)
+	}
 	if output == expected || output == expected + "\n" {
 		return true, output
 	} else {
