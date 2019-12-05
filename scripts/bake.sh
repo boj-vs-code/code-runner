@@ -1,19 +1,26 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-    echo "Usage: $0 <language>"
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <platform> <language>"
     exit
 fi
 
-language=$1
+platform=$1
+language=$2
+
+dockerfile_directory=$platform/dockerfiles/$language
+template_path=$platform/template/Dockerfile.jinja
+runner_configuration_path=$platform/runners/$language.yaml
 
 pushd runner
     go get
     go build
 popd
 
-mkdir -p boj/dockerfiles/$language
-cp runner/runner boj/dockerfiles/$language
+mkdir -p $dockerfile_directory
+cp runner/runner $dockerfile_directory
 jinja2 --format yaml\
-    boj/template/Dockerfile.jinja\
-    boj/runners/$language.yaml > boj/dockerfiles/$language/Dockerfile
+    $template_path\
+    $runner_configuration_path > $dockerfile_directory/Dockerfile
+
+docker build $dockerfile_directory -t code-runner-$platform-$language
