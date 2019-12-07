@@ -6,5 +6,5 @@ COPY ./runner /runner
     value.replace('"', "\\\"")}}"
 {% endfor %}
 RUN chmod +x /runner
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT /runner

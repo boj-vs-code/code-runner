@@ -10,5 +10,5 @@ func main() {
 	r := gin.Default()
 	v1 := gin_restful.NewApi(r, "/")
 	views.RegisterViews(v1)
-	_ = r.Run(":5000")
+	_ = r.Run(":80")
 }
