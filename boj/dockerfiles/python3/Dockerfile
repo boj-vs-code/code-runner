@@ -7,5 +7,5 @@ ENV RUNNER_SCRIPT="python3 Main.py"
 ENV RUNNER_COMPILE="python3 -c \"import py_compile; py_compile.compile(r'Main.py')\""
 
 RUN chmod +x /runner
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT /runner

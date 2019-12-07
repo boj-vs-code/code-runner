@@ -3,12 +3,14 @@ info:
   title: Code runner for boj-vs-code
   version: 0.1.0
 servers:
-  - url: https://endpoint.ainize.ai/moreal/code-runner-boj-python3
+  - url: https://endpoint.ainize.ai/moreal/code-runner-boj-cpp14
 paths:
   /:
     post:
       operationId: runner
       summary: Run solution
+      tags:
+      - runner
       requestBody:
         description: request with problem id and solution.
         content:
@@ -21,7 +23,7 @@ paths:
                   example: 1000
                 code:
                   type: integer
-                  example: print(sum(map(int, input().split())))
+                  example: "#include <iostream> <cpp-code>..."
       responses:
         '200':
           description: response including data about the run.
@@ -30,19 +32,19 @@ paths:
               examples:
                 success:
                   value:
-                    code: "print(sum(map(int, input().split())))"  # the code you ran.
+                    code: "#include <iostream> <cpp-code, answer>..."  # the code you ran.
                     success: true  # result of the run.
                     failed: []  # failed cases.
                     message: ""  # more data
                 failed:
                   value:
-                    code: "print('hello world!')"  # the code you ran.
+                    code: "#include <iostream> <cpp-code, fail>..."  # the code you ran.
                     success: false  # result of the run.
                     failed: ['1 2', '3', 'hello world!']  # failed cases. list of [input, expected, actual]
                     message: ""  # more data
                 compile_error:
                   value:
-                    code: "print(sum(map(int, input().split()))))"  # the code you ran.
+                    code: "#include <iostream> <cpp-code, haivng wrong syntax>..."  # the code you ran.
                     success: false  # result of the run.
                     failed: []  # failed cases. list of [input, expected, actual]
-                    message: "compile error:   File Main.py, line 1 ~ <compiler error message.>..."
+                    message: "compile error: <compile-error-message>."

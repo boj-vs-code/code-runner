@@ -23,6 +23,8 @@ jinja2 --format yaml\
     $template_path\
     $runner_configuration_path > $dockerfile_directory/Dockerfile
 
-image_name="moreal/code-runner-$platform-$language"
-docker build $dockerfile_directory -t "$image_name"
-docker push "$image_name"
+docker_tag=latest
+docker_image_name="moreal/code-runner-$platform-$language:$docker_tag"
+
+docker build $dockerfile_directory -t "$docker_image_name"
+docker push "$docker_image_name"

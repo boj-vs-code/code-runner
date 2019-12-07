@@ -7,5 +7,5 @@ ENV RUNNER_COMPILE="g++ Main.cc -o Main -O2 -Wall -lm -static -std=gnu++14 -DONL
 ENV RUNNER_SCRIPT="./Main"
 
 RUN chmod +x /runner
-EXPOSE 5000
+EXPOSE 80
 ENTRYPOINT /runner
